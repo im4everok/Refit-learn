@@ -1,0 +1,6 @@
+@RefitLearn_HostAddress = http://localhost:5196
+
+GET {{RefitLearn_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
