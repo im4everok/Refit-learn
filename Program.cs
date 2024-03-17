@@ -1,7 +1,8 @@
-using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Mvc;
 using Refit;
 using RefitLearn;
 using RefitLearn.Models;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,14 +32,40 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapGet("getUsersWithRefit", async (IUsersClient client) =>
+var group = app.MapGroup("refit");
+
+group.MapGet("getUsers", async (IUsersClient client) =>
 {
     var users = await client.GetUsers();
 
+    StringBuilder str = new();
+
     foreach (User user in users)
     {
-        Console.WriteLine(user);
+        str.Append($"{user}, ");
     }
+
+    return str.ToString();
+});
+
+group.MapGet("getUserById", async (IUsersClient client, [FromQuery] int id) =>
+{
+    var user = await client.GetUser(1);
+
+    return user;
+});
+
+app.MapPost("createUser", async (IUsersClient client) =>
+{
+    var newUser = new User
+    {
+        Email = "alo123@gmail124.com",
+        Name = "Alok Dab"
+    };
+
+    var result = await client.CreateUser(newUser);
+
+    return result;
 });
 
 app.Run();
