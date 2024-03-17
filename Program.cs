@@ -1,3 +1,8 @@
+using Microsoft.Extensions.Options;
+using Refit;
+using RefitLearn;
+using RefitLearn.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,7 +12,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddOptions();
+builder.Services
+    .AddRefitClient<IUsersClient>()
+    .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://jsonplaceholder.typicode.com/"));
 
 var app = builder.Build();
 
@@ -23,5 +30,15 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapGet("getUsersWithRefit", async (IUsersClient client) =>
+{
+    var users = await client.GetUsers();
+
+    foreach (User user in users)
+    {
+        Console.WriteLine(user);
+    }
+});
 
 app.Run();
